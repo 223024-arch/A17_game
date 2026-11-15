@@ -388,7 +388,8 @@ function setupControls() {
     const handleMove = (e) => {
         if (gameState !== 'ready' || !currentFruitBody) return;
         
-        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const pointer = e.touches?.[0] || e.changedTouches?.[0] || e;
+        let clientX = pointer.clientX;
         const rect = canvas.getBoundingClientRect();
         
         // CSSでの拡縮率を考慮した座標計算
@@ -403,6 +404,8 @@ function setupControls() {
 
     const handleDrop = (e) => {
         if (gameState !== 'ready' || !currentFruitBody) return;
+        e.preventDefault();
+        handleMove(e);
         
         // 落下させる
         Body.setStatic(currentFruitBody, false);
@@ -422,7 +425,7 @@ function setupControls() {
     container.addEventListener('touchmove', handleMove, { passive: false }); // スクロール防止のためpassive:false
     
     container.addEventListener('mousedown', handleDrop);
-    container.addEventListener('touchend', handleDrop);
+    container.addEventListener('touchend', handleDrop, { passive: false });
 }
 
 // 描画・更新ループ (リッチなカスタムレンダリング)
